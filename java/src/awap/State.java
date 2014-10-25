@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -112,4 +113,19 @@ public class State {
   }
 
   public void setPlayers(List<String> players) {}
+
+  public List<List<Integer>> playMove(int team, Block block, Point point) {
+    List<List<Integer>> result = new ArrayList<>();
+    for (List<Integer> row : board) {
+      List<Integer> newRow = new ArrayList<Integer>();
+      for (Integer val : row) {
+        newRow.add(val);
+      }
+      result.add(newRow);
+    }
+    for (Point p : block.getPointsForMove(point)) {
+      result.get(p.getY()).set(p.getX(), team);
+    }
+    return result;
+  }
 }
