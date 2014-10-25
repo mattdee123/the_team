@@ -12,6 +12,7 @@ public class DistanceHeuristic implements Heuristic {
           ImmutableList.of(new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1));
 
   private static final double GREEDY_SCALE = 1000.0;
+  private static final double CLOSEST_BONUS = 10.0;
 
   private List<Point> getNeighbors(Point p, List<List<Integer>> board) {
     List<Point> nbrs = new ArrayList<>();
@@ -131,7 +132,9 @@ public class DistanceHeuristic implements Heuristic {
         if (!canPlace(newBoard, team, new Point(j, i))) {
           continue;
         }
-
+        if (myDist == minDist) {
+          result += CLOSEST_BONUS;
+        }
         result += ((double) minDist) / myDist;
       }
     }
