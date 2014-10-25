@@ -56,9 +56,9 @@ public class DistanceHeuristic implements Heuristic {
         distances.get(point.getY()).set(point.getX(), distance);
       }
       for (Point point : frontier) {
-        Set<Point> nbrs = Sets.newHashSet(getNeighbors(point, board));
+        List<Point> nbrs = getNeighbors(point, board);
         for (Point nbr : nbrs) {
-          if (distances.get(nbr.getY()).get(nbr.getX()).equals(Integer.MAX_VALUE)) {
+          if (distances.get(nbr.getY()).get(nbr.getX()).equals(Integer.MAX_VALUE) && canPlace(board, team, nbr)) {
             newFrontier.add(nbr);
           }
         }
