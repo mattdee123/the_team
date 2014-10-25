@@ -27,11 +27,11 @@ public class Game {
 
   private Move findMove() {
     int N = state.getDimension();
+    Heuristic heuristic = new GreedyHeuristic();
     List<Block> blocks = state.getBlocks().get(number);
 
-    int maxScore = 0;
-    Move maxMove = null;
-
+    double bestScore = 0;
+    Move bestMove = null;
     for (int x = 0; x < N; x++) {
       for (int y = 0; y < N; y++) {
         for (int rot = 0; rot < 4; rot++) {
@@ -39,10 +39,10 @@ public class Game {
             Block rotBlock = blocks.get(i).rotate(rot);
             Point point = new Point(x, y);
             if (canPlace(rotBlock, point)) {
-              int score = getScore(rotBlock, point);
-              if (score > maxScore) {
-                maxMove = new Move(i, rot, x, y);
-                maxScore = score;
+              double score = heuristic.evaluate(state, rotBlock, point);
+              if (score > bestScore) {
+                bestMove = new Move(i, rot, x, y);
+                bestScore = score;
               }
             }
           }
@@ -50,21 +50,7 @@ public class Game {
       }
     }
 
-    return maxMove != null ? maxMove : new Move(0, 0, 0, 0);
-  }
-
-  private int getScore(Block block, Point point) {
-    List<Point> blockPoints = block.getPointsForMove(point);
-    List<Point> bonusPoints = state.getBonusPoints();
-    int multiplier = 1;
-    for (Point blockPoint : blockPoints) {
-      for (Point bonusPoint : bonusPoints) {
-        if (blockPoint.equals(bonusPoint)) {
-          multiplier = 3;
-        }
-      }
-    }
-    return block.size() * multiplier;
+    return bestMove != null ? bestMove : new Move(0, 0, 0, 0);
   }
 
   private int getPos(int x, int y) {
