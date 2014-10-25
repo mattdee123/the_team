@@ -49,7 +49,7 @@ public class DistanceHeuristic implements Heuristic {
       for (Point point : frontier) {
         List<Point> nbrs = getNeighbors(point, board);
         for (Point nbr : nbrs) {
-          if (distances.get(nbr.getY()).get(nbr.getX()) == -1) {
+          if (distances.get(nbr.getY()).get(nbr.getX()) == Integer.MAX_VALUE) {
             newFrontier.add(nbr);
           }
         }
