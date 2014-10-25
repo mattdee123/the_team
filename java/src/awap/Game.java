@@ -29,19 +29,42 @@ public class Game {
     int N = state.getDimension();
     List<Block> blocks = state.getBlocks().get(number);
 
+    int maxScore = 0;
+    Move maxMove = null;
+
     for (int x = 0; x < N; x++) {
       for (int y = 0; y < N; y++) {
         for (int rot = 0; rot < 4; rot++) {
           for (int i = 0; i < blocks.size(); i++) {
-            if (canPlace(blocks.get(i).rotate(rot), new Point(x, y))) {
-              return new Move(i, rot, x, y);
+            Block rotBlock = blocks.get(i).rotate(rot);
+            Point point = new Point(x, y);
+            if (canPlace(rotBlock, point)) {
+              int score = getScore(rotBlock, point);
+              if (score > maxScore) {
+                maxMove = new Move(i, rot, x, y);
+                maxScore = score;
+              }
             }
           }
         }
       }
     }
 
-    return new Move(0, 0, 0, 0);
+    return maxMove != null ? maxMove : new Move(0, 0, 0, 0);
+  }
+
+  private int getScore(Block block, Point point) {
+    List<Point> blockPoints = block.getPointsForMove(point);
+    List<Point> bonusPoints = state.getBonusPoints();
+    int multiplier = 1;
+    for (Point blockPoint : blockPoints) {
+      for (Point bonusPoint : bonusPoints) {
+        if (blockPoint.equals(bonusPoint)) {
+          multiplier = 3;
+        }
+      }
+    }
+    return block.size() * multiplier;
   }
 
   private int getPos(int x, int y) {

@@ -1,10 +1,9 @@
 package awap;
 
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
 
 public class Block {
   private List<Point> offsets;
@@ -26,6 +25,10 @@ public class Block {
 
   public void setOffsets(List<Point> offsets) {
     this.offsets = offsets;
+  }
+
+  public int size() {
+    return this.offsets.size();
   }
 
   public Block rotate(final int rotations) {
