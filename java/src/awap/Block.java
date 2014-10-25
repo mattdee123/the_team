@@ -42,4 +42,13 @@ public class Block {
 
     return block;
   }
+
+  public List<Point> getPointsForMove(final Point loc) {
+    return Lists.transform(offsets, new Function<Point, Point>() {
+      @Override
+      public Point apply(Point point) {
+        return point.add(loc);
+      }
+    });
+  }
 }
