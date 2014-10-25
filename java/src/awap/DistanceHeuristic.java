@@ -84,6 +84,33 @@ public class DistanceHeuristic implements Heuristic {
     return true;
   }
 
+  public double teamScore(List<List<Integer>> myTeam, List<List<Integer>> mins,
+                          List<List<Integer>> newBoard, int team) {
+    double result = 0.0;
+
+    for (int i = 0; i < myTeam.size(); i++) {
+      for (int j = 0; j < myTeam.get(i).size(); j++) {
+        int myDist = myTeam.get(i).get(j);
+        int minDist = mins.get(i).get(j);
+
+        if (myDist == 0.0) {
+          result += 1.0;
+        }
+        if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) {
+          continue;
+        }
+        if (!canPlace(newBoard, team, new Point(j, i))) {
+          continue;
+        }
+        if (myDist == minDist) {
+          result += CLOSEST_BONUS;
+        }
+        result += ((double) minDist) / myDist;
+      }
+    }
+    return result;
+  }
+
   @Override
   public double evaluate(State state, int team, Block block, Point point) {
     List<List<Integer>> newBoard = state.playMove(team, block, point);
@@ -116,28 +143,7 @@ public class DistanceHeuristic implements Heuristic {
       }
     }
 
-    double result = 0.0;
-
-    for (int i = 0; i < myTeam.size(); i++) {
-      for (int j = 0; j < myTeam.get(i).size(); j++) {
-        int myDist = myTeam.get(i).get(j);
-        int minDist = mins.get(i).get(j);
-
-        if (myDist == 0.0) {
-          result += 1.0;
-        }
-        if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) {
-          continue;
-        }
-        if (!canPlace(newBoard, team, new Point(j, i))) {
-          continue;
-        }
-        if (myDist == minDist) {
-          result += CLOSEST_BONUS;
-        }
-        result += ((double) minDist) / myDist;
-      }
-    }
+    double result = teamScore(myTeam, mins, newBoard, team);
 
     Logger.log(result);
     double greedy = new GreedyHeuristic().evaluate(state, team, block, point);
