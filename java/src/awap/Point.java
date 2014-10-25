@@ -24,6 +24,14 @@ public class Point {
     return x == p.x && y == p.y;
   }
 
+  @Override
+  public String toString() {
+    return "Point{" +
+            "x=" + x +
+            ", y=" + y +
+            '}';
+  }
+
   public Point rotate(int numRotations) {
     switch (numRotations) {
       case 1:
