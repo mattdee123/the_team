@@ -11,6 +11,8 @@ public class DistanceHeuristic implements Heuristic {
   private static final List<Point> fourPoint =
           ImmutableList.of(new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1));
 
+  private static final double GREEDY_SCALE = 1000.0;
+
   private List<Point> getNeighbors(Point p, List<List<Integer>> board) {
     List<Point> nbrs = new ArrayList<>();
     for (int xOff = -1; xOff <= 1; xOff++) {
@@ -133,6 +135,9 @@ public class DistanceHeuristic implements Heuristic {
         result += ((double) minDist) / myDist;
       }
     }
-    return result + new GreedyHeuristic().evaluate(state, team, block, point);
+
+    Logger.log(result);
+    double greedy = new GreedyHeuristic().evaluate(state, team, block, point);
+    return result + greedy * GREEDY_SCALE;
   }
 }
