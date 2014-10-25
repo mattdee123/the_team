@@ -13,6 +13,7 @@ public class DistanceHeuristic implements Heuristic {
 
   private static final double GREEDY_SCALE = 1000.0;
   private static final double CLOSEST_BONUS = 10.0;
+  private static final double OTHER_TEAM_SCORE_SCALE = 0.5;
 
   private List<Point> getNeighbors(Point p, List<List<Integer>> board) {
     List<Point> nbrs = new ArrayList<>();
@@ -143,7 +144,16 @@ public class DistanceHeuristic implements Heuristic {
       }
     }
 
-    double result = teamScore(myTeam, mins, newBoard, team);
+    double myTeamScore = teamScore(myTeam, mins, newBoard, team);
+
+    double otherTeamScore = 0.0;
+    for (int i = 0; i < 4; i++) {
+      if (i != team) {
+        otherTeamScore += teamScore(teamDistances.get(i), mins, newBoard, i);
+      }
+    }
+
+    double result = myTeamScore - (otherTeamScore * OTHER_TEAM_SCORE_SCALE);
 
     Logger.log(result);
     double greedy = new GreedyHeuristic().evaluate(state, team, block, point);
