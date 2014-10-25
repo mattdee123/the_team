@@ -124,7 +124,7 @@ public class State {
       result.add(newRow);
     }
     for (Point p : block.getPointsForMove(point)) {
-      result.get(p.getY()).set(p.getX(), team);
+      result.get(p.getX()).set(p.getY(), team);
     }
     return result;
   }

@@ -114,6 +114,8 @@ public class DistanceHeuristic implements Heuristic {
 
   @Override
   public double evaluate(State state, int team, Block block, Point point) {
+
+
     List<List<Integer>> newBoard = state.playMove(team, block, point);
     List<List<List<Integer>>> teamDistances = new ArrayList<>();
 
