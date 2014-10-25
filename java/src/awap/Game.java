@@ -27,10 +27,10 @@ public class Game {
 
   private Move findMove() {
     int N = state.getDimension();
-    Heuristic heuristic = new GreedyHeuristic();
+    Heuristic heuristic = new DistanceHeuristic();
     List<Block> blocks = state.getBlocks().get(number);
 
-    double bestScore = 0;
+    double bestScore = -Double.MAX_VALUE;
     Move bestMove = null;
     for (int x = 0; x < N; x++) {
       for (int y = 0; y < N; y++) {
@@ -39,7 +39,8 @@ public class Game {
             Block rotBlock = blocks.get(i).rotate(rot);
             Point point = new Point(x, y);
             if (canPlace(rotBlock, point)) {
-              double score = heuristic.evaluate(state, rotBlock, point);
+//              new DistanceHeuristic().evaluate(state, number, rotBlock, point);
+              double score = heuristic.evaluate(state, number, rotBlock, point);
               if (score > bestScore) {
                 bestMove = new Move(i, rot, x, y);
                 bestScore = score;

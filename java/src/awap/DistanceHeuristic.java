@@ -1,20 +1,25 @@
 package awap;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class DistanceHeuristic implements Heuristic {
+  private static final List<Point> fourPoint =
+      ImmutableList.of(new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1));
 
   private List<Point> getNeighbors(Point p, List<List<Integer>> board) {
     List<Point> nbrs = new ArrayList<>();
     for (int xOff = -1; xOff <= 1; xOff++) {
       for (int yOff = -1; yOff <= 1; yOff++) {
-        if (xOff == 0 && yOff == 0) continue;
+        if (xOff == 0 && yOff == 0) { continue; }
         int newY = p.getY() + yOff;
         int newX = p.getX() + xOff;
-        if (newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size() && board.get(newY).get(newX) == -1) {
+        if (newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size() &&
+            board.get(newY).get(newX) == -1) {
           nbrs.add(new Point(newX, newY));
         }
       }
@@ -23,7 +28,7 @@ public class DistanceHeuristic implements Heuristic {
   }
 
   private List<List<Integer>> distanceFrom(int team, List<List<Integer>> board) {
-    List<Point> frontier = new ArrayList<>();
+    Set<Point> frontier = Sets.newHashSet();
     List<List<Integer>> distances = new ArrayList<>();
     for (List<Integer> row : board) {
       List<Integer> newRow = new ArrayList<>();
@@ -34,22 +39,22 @@ public class DistanceHeuristic implements Heuristic {
     } // init frontier
     for (int i = 0; i < board.size(); i++) {
       for (int j = 0; j < board.size(); j++) {
-        if (board.get(i).get(j) == team) {
-          frontier.add(new Point(j,i));
+        if (board.get(i).get(j).equals(team)) {
+          frontier.add(new Point(j, i));
         }
       }
     }
     int distance = 0;
     while (!frontier.isEmpty()) {
-      List<Point> newFrontier = new ArrayList<>();
+      Set<Point> newFrontier = Sets.newHashSet();
 
       for (Point point : frontier) {
         distances.get(point.getY()).set(point.getX(), distance);
       }
       for (Point point : frontier) {
-        List<Point> nbrs = getNeighbors(point, board);
+        Set<Point> nbrs = Sets.newHashSet(getNeighbors(point, board));
         for (Point nbr : nbrs) {
-          if (distances.get(nbr.getY()).get(nbr.getX()) == Integer.MAX_VALUE) {
+          if (distances.get(nbr.getY()).get(nbr.getX()).equals(Integer.MAX_VALUE)) {
             newFrontier.add(nbr);
           }
         }
@@ -60,22 +65,21 @@ public class DistanceHeuristic implements Heuristic {
     return distances;
   }
 
-  List<Point> fourPoint = ImmutableList.of(new Point(-1, 0), new Point(1,0), new Point(0,-1), new Point(0,1));
-  boolean canPlace(List<List<Integer>> board, int team, Point pos) {
+  private boolean canPlace(List<List<Integer>> board, int team, Point pos) {
     for (Point point : fourPoint) {
       Point nbr = pos.add(point);
       int newY = nbr.getY();
       int newX = nbr.getX();
-      if ( newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size()) {
-        if (board.get(newY).get(newX) == team) return false;
+      if (newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size()) {
+        if (board.get(newY).get(newX) == team) { return false; }
       }
     }
     return true;
   }
 
   @Override
-  public double evaluate(State state, Block block, Point point) {
-    int team = state.getNumber().get();
+  public double evaluate(State state, int team, Block block, Point point) {
+    Logger.log(state.getTurn());
     List<List<Integer>> newBoard = state.playMove(team, block, point);
     List<List<List<Integer>>> teamDistances = new ArrayList<>();
 
@@ -98,8 +102,8 @@ public class DistanceHeuristic implements Heuristic {
       for (int j = 0; j < mins.get(i).size(); j++) {
         int min = Integer.MAX_VALUE;
         for (int k = 0; k < 4; k++) {
-          if (min < teamDistances.get(k).get(i).get(j)) {
-           min = teamDistances.get(k).get(i).get(j);
+          if (min > teamDistances.get(k).get(i).get(j)) {
+            min = teamDistances.get(k).get(i).get(j);
           }
         }
         mins.get(i).set(j, min);
@@ -112,14 +116,21 @@ public class DistanceHeuristic implements Heuristic {
       for (int j = 0; j < myTeam.get(i).size(); j++) {
         int myDist = myTeam.get(i).get(j);
         int minDist = mins.get(i).get(j);
-        if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) continue;
-        if (!canPlace(newBoard, team, new Point(j,i))) continue;
-        if (myDist == minDist) {
-          result += ((float)minDist) / myDist;
+        if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) {
+          continue;
         }
+        if (!canPlace(newBoard, team, new Point(j, i))) { continue; }
+        //        if (myDist >= minDist) {
+        result += ((double) minDist) / myDist;
+        //        }
       }
     }
-    Logger.log("result = "+result);
-    return 0.0;
+    //    Logger.log("result = " + result);
+    //    Logger.log("MYTEAM =");
+    //    Logger.logMatrix(myTeam);
+    //    Logger.log("");
+    //    Logger.log("MINS =");
+    //    Logger.logMatrix(mins);
+    return result + new GreedyHeuristic().evaluate(state, team, block, point);
   }
 }

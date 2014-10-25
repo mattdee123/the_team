@@ -4,7 +4,7 @@ import java.util.List;
 
 public class GreedyHeuristic implements Heuristic {
   @Override
-  public double evaluate(State state, Block block, Point point) {
+  public double evaluate(State state, int team, Block block, Point point) {
     List<Point> blockPoints = block.getPointsForMove(point);
     List<Point> bonusPoints = state.getBonusPoints();
     int multiplier = 1;
