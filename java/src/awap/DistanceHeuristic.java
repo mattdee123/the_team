@@ -79,7 +79,6 @@ public class DistanceHeuristic implements Heuristic {
 
   @Override
   public double evaluate(State state, int team, Block block, Point point) {
-    Logger.log(state.getTurn());
     List<List<Integer>> newBoard = state.playMove(team, block, point);
     List<List<List<Integer>>> teamDistances = new ArrayList<>();
 
@@ -125,12 +124,7 @@ public class DistanceHeuristic implements Heuristic {
         //        }
       }
     }
-    //    Logger.log("result = " + result);
-    //    Logger.log("MYTEAM =");
-    //    Logger.logMatrix(myTeam);
-    //    Logger.log("");
-    //    Logger.log("MINS =");
-    //    Logger.logMatrix(mins);
+
     return result + new GreedyHeuristic().evaluate(state, team, block, point);
   }
 }
