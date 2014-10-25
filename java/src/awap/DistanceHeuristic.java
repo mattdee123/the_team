@@ -1,5 +1,7 @@
 package awap;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class DistanceHeuristic implements Heuristic {
     for (List<Integer> row : board) {
       List<Integer> newRow = new ArrayList<>();
       for (Integer val : row) {
-        newRow.add(-1);
+        newRow.add(Integer.MAX_VALUE);
       }
       distances.add(newRow);
     } // init frontier
@@ -58,13 +60,66 @@ public class DistanceHeuristic implements Heuristic {
     return distances;
   }
 
-
-
+  List<Point> fourPoint = ImmutableList.of(new Point(-1, 0), new Point(1,0), new Point(0,-1), new Point(0,1));
+  boolean canPlace(List<List<Integer>> board, int team, Point pos) {
+    for (Point point : fourPoint) {
+      Point nbr = pos.add(point);
+      int newY = nbr.getY();
+      int newX = nbr.getX();
+      if ( newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size()) {
+        if (board.get(newY).get(newX) == team) return false;
+      }
+    }
+    return true;
+  }
 
   @Override
   public double evaluate(State state, Block block, Point point) {
     int team = state.getNumber().get();
     List<List<Integer>> newBoard = state.playMove(team, block, point);
+    List<List<List<Integer>>> teamDistances = new ArrayList<>();
+
+    for (int i = 0; i < 4; i++) {
+      teamDistances.add(distanceFrom(i, newBoard));
+    }
+
+    List<List<Integer>> myTeam = teamDistances.get(team);
+
+    List<List<Integer>> mins = new ArrayList<>();
+    for (List<Integer> row : myTeam) {
+      List<Integer> newRow = new ArrayList<>();
+      for (Integer val : row) {
+        newRow.add(Integer.MAX_VALUE);
+      }
+      mins.add(newRow);
+    }
+
+    for (int i = 0; i < mins.size(); i++) {
+      for (int j = 0; j < mins.get(i).size(); j++) {
+        int min = Integer.MAX_VALUE;
+        for (int k = 0; k < 4; k++) {
+          if (min < teamDistances.get(k).get(i).get(j)) {
+           min = teamDistances.get(k).get(i).get(j);
+          }
+        }
+        mins.get(i).set(j, min);
+      }
+    }
+
+    double result = 0.0;
+
+    for (int i = 0; i < myTeam.size(); i++) {
+      for (int j = 0; j < myTeam.get(i).size(); j++) {
+        int myDist = myTeam.get(i).get(j);
+        int minDist = mins.get(i).get(j);
+        if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) continue;
+        if (!canPlace(newBoard, team, new Point(j,i))) continue;
+        if (myDist == minDist) {
+          result += ((float)minDist) / myDist;
+        }
+      }
+    }
+    Logger.log("result = "+result);
     return 0.0;
   }
 }
