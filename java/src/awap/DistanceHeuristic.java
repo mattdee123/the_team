@@ -9,17 +9,19 @@ import java.util.Set;
 
 public class DistanceHeuristic implements Heuristic {
   private static final List<Point> fourPoint =
-      ImmutableList.of(new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1));
+          ImmutableList.of(new Point(-1, 0), new Point(1, 0), new Point(0, -1), new Point(0, 1));
 
   private List<Point> getNeighbors(Point p, List<List<Integer>> board) {
     List<Point> nbrs = new ArrayList<>();
     for (int xOff = -1; xOff <= 1; xOff++) {
       for (int yOff = -1; yOff <= 1; yOff++) {
-        if (xOff == 0 && yOff == 0) { continue; }
+        if (xOff == 0 && yOff == 0) {
+          continue;
+        }
         int newY = p.getY() + yOff;
         int newX = p.getX() + xOff;
         if (newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size() &&
-            board.get(newY).get(newX) == -1) {
+                board.get(newY).get(newX) == -1) {
           nbrs.add(new Point(newX, newY));
         }
       }
@@ -71,7 +73,9 @@ public class DistanceHeuristic implements Heuristic {
       int newY = nbr.getY();
       int newX = nbr.getX();
       if (newX >= 0 && newY >= 0 && newX < board.size() && newY < board.size()) {
-        if (board.get(newY).get(newX) == team) { return false; }
+        if (board.get(newY).get(newX) == team) {
+          return false;
+        }
       }
     }
     return true;
@@ -115,16 +119,20 @@ public class DistanceHeuristic implements Heuristic {
       for (int j = 0; j < myTeam.get(i).size(); j++) {
         int myDist = myTeam.get(i).get(j);
         int minDist = mins.get(i).get(j);
+
+        if (myDist == 0.0) {
+          result += 1.0;
+        }
         if (minDist <= 0 || minDist == Integer.MAX_VALUE || myDist == Integer.MAX_VALUE) {
           continue;
         }
-        if (!canPlace(newBoard, team, new Point(j, i))) { continue; }
-        //        if (myDist >= minDist) {
+        if (!canPlace(newBoard, team, new Point(j, i))) {
+          continue;
+        }
+
         result += ((double) minDist) / myDist;
-        //        }
       }
     }
-
     return result + new GreedyHeuristic().evaluate(state, team, block, point);
   }
 }
