@@ -1,7 +1,9 @@
 package awap;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ public class State {
   private int move = -1;
   private String url;
   private List<List<Integer>> bonusSquares;
+  private List<Point> bonusPoints;
 
   public String getUrl() {
     return url;
@@ -48,6 +51,14 @@ public class State {
   public void setBoard(Map<String, Object> board) {
     this.board = (List<List<Integer>>) board.get("grid");
     this.bonusSquares = (List<List<Integer>>) board.get("bonus_squares");
+
+    this.bonusPoints = Lists.transform(bonusSquares, new Function<List<Integer>, Point>() {
+      @Override
+      public Point apply(List<Integer> integers) {
+        return new Point(integers.get(0), integers.get(1));
+      }
+    });
+
     this.setDimension((int) board.get("dimension"));
   }
 
@@ -94,6 +105,10 @@ public class State {
 
   public List<List<Integer>> getBonusSquares() {
     return bonusSquares;
+  }
+
+  public List<Point> getBonusPoints() {
+    return bonusPoints;
   }
 
   public void setPlayers(List<String> players) {}
