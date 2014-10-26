@@ -157,7 +157,7 @@ public class DistanceHeuristic implements Heuristic {
 
     double result = myTeamScore - (otherTeamScore * OTHER_TEAM_SCORE_SCALE);
 
-    Logger.log(result);
+//    Logger.log(result);
     double greedy = new GreedyHeuristic().evaluate(state, team, block, point);
     return result + greedy * GREEDY_SCALE;
   }

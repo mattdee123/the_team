@@ -50,7 +50,7 @@ public class Game {
         }
       }
     }
-
+    System.err.println(bestMove);
     return bestMove != null ? bestMove : new Move(0, 0, 0, 0);
   }
 
